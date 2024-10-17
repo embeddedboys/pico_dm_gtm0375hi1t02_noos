@@ -50,12 +50,12 @@ void __time_critical_func(i80_set_rs)(bool rs)
 /* DMA version */
 static uint dma_tx;
 static dma_channel_config c;
-static inline void __time_critical_func(i80_write_pio16_wr)(PIO pio, uint sm, void *buf, size_t len)
+static inline void __time_critical_func(i80_write_pio8_wr)(PIO pio, uint sm, void *buf, size_t len)
 {
     dma_channel_configure(dma_tx, &c,
                           &pio->txf[sm], /* write address */
-                          (uint16_t *)buf, /* read address */
-                          len / 2, /* element count (each element is of size transfer_data_size) */
+                          (uint8_t *)buf, /* read address */
+                          len, /* element count (each element is of size transfer_data_size) */
                           true /* start right now */
     );
 
@@ -65,18 +65,18 @@ static inline void __time_critical_func(i80_write_pio16_wr)(PIO pio, uint sm, vo
     dma_channel_wait_for_finish_blocking(dma_tx);
 }
 #else
-static inline int i80_write_pio16_wr(PIO pio, uint sm, void *buf, size_t len)
+static inline int i80_write_pio8_wr(PIO pio, uint sm, void *buf, size_t len)
 {
-    uint16_t data;
+    uint8_t data;
 
     i80_wait_idle(pio, sm);
     while (len) {
-        data = *(uint16_t *)buf;
+        data = *(uint8_t *)buf;
 
         i80_put(pio, sm, data);
 
-        buf += 2;
-        len -= 2;
+        buf ++;
+        len --;
     }
     i80_wait_idle(pio, sm);
     return 0;
@@ -86,7 +86,7 @@ static inline int i80_write_pio16_wr(PIO pio, uint sm, void *buf, size_t len)
 void __time_critical_func(i80_write_buf_rs)(void *buf, size_t len, bool rs)
 {
     i80_set_rs(rs);
-    i80_write_pio16_wr(g_pio, g_sm, buf, len);
+    i80_write_pio8_wr(g_pio, g_sm, buf, len);
 }
 
 int i80_pio_init(uint8_t db_base, uint8_t db_count, uint8_t pin_wr)
@@ -97,7 +97,7 @@ int i80_pio_init(uint8_t db_base, uint8_t db_count, uint8_t pin_wr)
     dma_tx = dma_claim_unused_channel(true);
     c = dma_channel_get_default_config(dma_tx);
 
-    channel_config_set_transfer_data_size(&c, DMA_SIZE_16);
+    channel_config_set_transfer_data_size(&c, DMA_SIZE_8);
     channel_config_set_dreq(&c, pio_get_dreq(g_pio, g_sm, true));
 #endif
 

@@ -31,7 +31,7 @@ include(pico_sdk_import.cmake)
 include(pico_extras_import_optional.cmake)
 
 # set the project name
-project(pico_dm_qd3503728 C CXX ASM)
+project(pico_dm_gtm0375hi1t02 C CXX ASM)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
@@ -124,17 +124,18 @@ endif() # OVERCLOCK_ENABLED
 
 # LCD Pins for 8080 interface
 set(LCD_PIN_DB_BASE  0)  # 8080 LCD data bus base pin
-set(LCD_PIN_DB_COUNT 16) # 8080 LCD data bus pin count
-set(LCD_PIN_CS  18)  # 8080 LCD chip select pin
+set(LCD_PIN_DB_COUNT 8) # 8080 LCD data bus pin count
+set(LCD_PIN_CS  29)  # 8080 LCD chip select pin
 set(LCD_PIN_WR  19)  # 8080 LCD write pin
 set(LCD_PIN_RS  20)  # 8080 LCD register select pin
-set(LCD_PIN_RST 22)  # 8080 LCD reset pin
+set(LCD_PIN_RD  29)  # 8080 LCD read pin
+set(LCD_PIN_RST 18)  # 8080 LCD reset pin
 set(LCD_PIN_BL  28)  # 8080 LCD backlight pin
 set(LCD_HOR_RES 480)
 set(LCD_VER_RES 320)
 set(DISP_OVER_PIO 1) # 1: PIO, 0: GPIO
 set(PIO_USE_DMA   1)   # 1: use DMA, 0: not use DMA
-set(I80_BUS_WR_CLK_KHZ 58000)
+set(I80_BUS_WR_CLK_KHZ 80000)
 if(${PICO_BOARD} STREQUAL "pico" OR ${PICO_PLATFORM} STREQUAL "rp2040")
     math(EXPR MY_DISP_BUF_SIZE "${LCD_HOR_RES} * ${LCD_VER_RES} / 2")
 elseif(${PICO_BOARD} STREQUAL "pico2" OR ${PICO_PLATFORM} STREQUAL "rp2350")
@@ -164,10 +165,9 @@ target_link_libraries(lvgl PRIVATE pico_stdlib)
 file(GLOB_RECURSE COMMON_SOURCES
     main.c
     ili9488.c
-    ft6236.c
+    ns2009.c
     porting/lv_port_disp_template.c
     porting/lv_port_indev_template.c
-    i2c_tools.c
     backlight.c
 )
 
@@ -192,6 +192,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_PIN_DB_COUNT=${LCD_PIN_DB_
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_PIN_CS=${LCD_PIN_CS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_PIN_WR=${LCD_PIN_WR})
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_PIN_RS=${LCD_PIN_RS})
+target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_PIN_RD=${LCD_PIN_RD})
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_PIN_RST=${LCD_PIN_RST})
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_PIN_BL=${LCD_PIN_BL})
 target_compile_definitions(${PROJECT_NAME} PUBLIC LCD_HOR_RES=${LCD_HOR_RES})
