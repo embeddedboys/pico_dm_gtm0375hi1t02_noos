@@ -61,7 +61,7 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
 endif()
 
 # Set all global variables here
-set(OVERCLOCK_ENABLED 1)    # 1: enable, 0: disable
+set(OVERCLOCK_ENABLED 0)    # 1: enable, 0: disable
 
 if(OVERCLOCK_ENABLED)
 
@@ -134,8 +134,14 @@ set(LCD_PIN_BL  28)  # 8080 LCD backlight pin
 set(LCD_HOR_RES 480)
 set(LCD_VER_RES 320)
 set(DISP_OVER_PIO 1) # 1: PIO, 0: GPIO
-set(PIO_USE_DMA   1)   # 1: use DMA, 0: not use DMA
-set(I80_BUS_WR_CLK_KHZ 80000)
+set(PIO_USE_DMA   1)   # 1: use DMA, 0: not use
+
+if($SYS_CLK_KHZ GREATER 160000)
+    set(I80_BUS_WR_CLK_KHZ 80000)
+else()
+    set(I80_BUS_WR_CLK_KHZ 62500)
+endif()
+
 if(${PICO_BOARD} STREQUAL "pico" OR ${PICO_PLATFORM} STREQUAL "rp2040")
     math(EXPR MY_DISP_BUF_SIZE "${LCD_HOR_RES} * ${LCD_VER_RES} / 2")
 elseif(${PICO_BOARD} STREQUAL "pico2" OR ${PICO_PLATFORM} STREQUAL "rp2350")
